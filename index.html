@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Cybersecurity Awareness - Mobile Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #0a0a0a;
+            color: #e8e8e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Background */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        /* Login Card */
+        .login-card {
+            width: 300px;
+            padding: 0;
+        }
+
+        /* Logo Section */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+            text-transform: uppercase;
+            margin: 0;
+            line-height: 1;
+        }
+
+        /* Form */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 48px;
+            padding: 0 14px;
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 8px;
+            font-size: 15px;
+            color: #e8e8e8;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-input::placeholder {
+            color: #888888;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #444444;
+            background: #222222;
+        }
+
+        .form-input:active {
+            border-color: #444444;
+        }
+
+        /* Login Button */
+        .login-button {
+            width: 100%;
+            height: 48px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #333333;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            text-transform: uppercase;
+        }
+
+        .login-button:active {
+            background: #252525;
+            border-color: #444444;
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Links Section */
+        .links-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .forgot-link {
+            display: block;
+            font-size: 12px;
+            color: #aaaaaa;
+            text-decoration: none;
+            margin-bottom: 16px;
+            transition: color 0.2s ease;
+        }
+
+        .forgot-link:active {
+            color: #dddddd;
+        }
+
+        /* Signup Section */
+        .signup-section {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #aaaaaa;
+        }
+
+        .signup-section a {
+            color: #dddddd;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .signup-section a:active {
+            color: #ffffff;
+        }
+
+        /* Success/Black Screen */
+        .success-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            z-index: 100;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .success-screen.active {
+            display: flex;
+        }
+
+        /* Error Message */
+        .error-message {
+            display: none;
+            font-size: 11px;
+            color: #ff6b6b;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Responsive for different phone sizes */
+        @media (max-width: 414px) {
+            .login-card {
+                width: 280px;
+            }
+
+            .logo-text {
+                font-size: 26px;
+                letter-spacing: 1px;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .login-card {
+                width: 260px;
+            }
+
+            .form-input,
+            .login-button {
+                height: 44px;
+                font-size: 14px;
+            }
+
+            .logo-text {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background -->
+    <div class="background">
+        <div class="background-image"></div>
+        <div class="background-overlay"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="login-card">
+            <!-- Logo -->
+            <div class="logo-section">
+                <h1 class="logo-text">NEXUS</h1>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form">
+                <!-- Username/Email/Phone Input -->
+                <div>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        class="form-input" 
+                        placeholder="Username, Email or Phone"
+                        required
+                    >
+                    <div class="error-message" id="usernameError"></div>
+                </div>
+
+                <!-- Password Input -->
+                <div>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="form-input" 
+                        placeholder="Password"
+                        required
+                    >
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="login-button">Log In</button>
+            </form>
+
+            <!-- Links Section -->
+            <div class="links-section">
+                <a href="#" class="forgot-link" id="forgotLink">Forgot Password or Username?</a>
+
+                <!-- Signup Section -->
+                <div class="signup-section">
+                    Don't have an account? <a href="#" id="signupLink">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Black Screen -->
+    <div class="success-screen" id="successScreen"></div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const usernameError = document.getElementById('usernameError');
+        const passwordError = document.getElementById('passwordError');
+        const successScreen = document.getElementById('successScreen');
+        const forgotLink = document.getElementById('forgotLink');
+        const signupLink = document.getElementById('signupLink');
+
+        // Clear errors on input
+        usernameInput.addEventListener('input', function() {
+            usernameError.classList.remove('show');
+        });
+
+        passwordInput.addEventListener('input', function() {
+            passwordError.classList.remove('show');
+        });
+
+        // Handle forgot password
+        forgotLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Password recovery feature is not available in this simulation.');
+        });
+
+        // Handle signup
+        signupLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Sign up feature is not available in this simulation.');
+        });
+
+        // Form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Clear previous errors
+            usernameError.classList.remove('show');
+            passwordError.classList.remove('show');
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            
+            let isValid = true;
+            
+            // Validation
+            if (!username) {
+                usernameError.textContent = 'Enter username, email, or phone';
+                usernameError.classList.add('show');
+                isValid = false;
+            }
+            
+            if (!password) {
+                passwordError.textContent = 'Enter password';
+                passwordError.classList.add('show');
+                isValid = false;
+            } else if (password.length < 6) {
+                passwordError.textContent = 'Password must be at least 6 characters';
+                passwordError.classList.add('show');
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // Disable button and show loading state
+            const loginButton = loginForm.querySelector('.login-button');
+            const originalText = loginButton.textContent;
+            loginButton.textContent = 'Logging in...';
+            loginButton.disabled = true;
+            
+            // Simulate login delay
+            setTimeout(() => {
+                // Show success/black screen
+                successScreen.classList.add('active');
+            }, 1200);
+        });
+
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (document.activeElement === usernameInput || document.activeElement === passwordInput) {
+                    loginForm.dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+    </script>
+</body>
+</html>
